@@ -1,0 +1,26 @@
+name: energyatit
+description: Connect AI agents to energy infrastructure. Dispatch batteries, attest carbon, read meters across 8 protocols.
+version: 1.0.0
+license: MIT
+author:
+  name: Karthikeyan DS
+  email: dsk@energyatit.com
+repository: https://github.com/kasathur/energyatit-mcp-server
+
+startCommand:
+  type: stdio
+  configSchema:
+    type: object
+    properties:
+      ENERGYATIT_API_KEY:
+        type: string
+        description: Your EnergyAtIt API key (get one free at energyatit.com/developers)
+    required: []
+  commandFunction: |-
+    (config) => ({
+      command: 'npx',
+      args: ['-y', 'energyatit-mcp-server'],
+      env: {
+        ENERGYATIT_API_KEY: config.ENERGYATIT_API_KEY ?? ''
+      }
+    })
