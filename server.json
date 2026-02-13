@@ -1,7 +1,7 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.kasathur/energyatit",
-  "description": "Connect AI agents to energy infrastructure. Dispatch batteries, verify carbon attestations, read grid meters, generate compliance packages. 30+ tools across 8 grid protocols (IEC 61850, DNP3, Modbus, OpenADR, OCPP, IEEE 2030.5, ICCP, REST). The first and only energy MCP server.",
+  "description": "Connect AI agents to energy infrastructure. Dispatch, attest carbon, read meters.",
   "repository": {
     "url": "https://github.com/kasathur/energyatit-mcp-server",
     "source": "github"
