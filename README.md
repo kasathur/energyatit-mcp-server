@@ -38,7 +38,7 @@ Connect AI agents to energy infrastructure. The first and only energy MCP server
 ### Install
 
 ```bash
-npx @energyatit/mcp-server
+npx energyatit-mcp-server
 ```
 
 ### Claude Desktop Config
@@ -50,7 +50,7 @@ Add to your Claude Desktop config (`~/Library/Application Support/Claude/claude_
   "mcpServers": {
     "energyatit": {
       "command": "npx",
-      "args": ["-y", "@energyatit/mcp-server"],
+      "args": ["-y", "energyatit-mcp-server"],
       "env": {
         "ENERGYATIT_API_KEY": "your-key-here"
       }
@@ -64,7 +64,7 @@ No API key? The sandbox works without one -- try it first.
 ### Claude Code
 
 ```bash
-claude mcp add energyatit -- npx -y @energyatit/mcp-server
+claude mcp add energyatit -- npx -y energyatit-mcp-server
 ```
 
 ### Try it
