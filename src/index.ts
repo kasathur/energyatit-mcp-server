@@ -3,6 +3,21 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 
+// ─── Proxy support ─────────────────────────────────────────────────────────
+// Node.js native fetch does not respect https_proxy / http_proxy env vars.
+// When running behind a proxy (e.g. corporate networks, containers), we use
+// undici's ProxyAgent so all fetch() calls are routed correctly.
+const PROXY_URL = process.env.https_proxy ?? process.env.HTTPS_PROXY ??
+                  process.env.http_proxy  ?? process.env.HTTP_PROXY  ?? "";
+if (PROXY_URL) {
+  try {
+    const { ProxyAgent, setGlobalDispatcher } = await import("undici");
+    setGlobalDispatcher(new ProxyAgent(PROXY_URL));
+  } catch {
+    // undici not available — proxy won't be used
+  }
+}
+
 // ─── Config ────────────────────────────────────────────────────────────────
 
 const BASE_URL = (
