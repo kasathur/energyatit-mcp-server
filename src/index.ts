@@ -28,6 +28,7 @@ const BASE_URL = (
 
 const API_KEY = process.env.ENERGYATIT_API_KEY ?? "";
 const TOKEN = process.env.ENERGYATIT_TOKEN ?? "";
+const DEMO_MODE = !API_KEY && !TOKEN;
 
 function authHeaders(): Record<string, string> {
   const h: Record<string, string> = { "Content-Type": "application/json" };
@@ -79,13 +80,13 @@ function errorResult(err: unknown) {
 
 const server = new McpServer({
   name: "energyatit",
-  version: "1.0.0",
+  version: "0.2.0",
 });
 
 // ── Sites ────────────────────────────────────────────────────────────────
 
 server.tool("list_sites", "List all energy sites in your tenant", {}, async () => {
-  try { return text(await apiGet("/api/sites")); }
+  try { return text(await apiGet(DEMO_MODE ? "/api/v1/demo/sites" : "/api/sites")); }
   catch (e) { return errorResult(e); }
 });
 
@@ -102,6 +103,7 @@ server.tool("list_assets", "List assets, optionally filtered by site", {
   site_id: z.number().optional().describe("Optional site ID filter"),
 }, async ({ site_id }) => {
   try {
+    if (DEMO_MODE) return text(await apiGet("/api/v1/demo/assets"));
     const qs = site_id ? `?siteId=${site_id}` : "";
     return text(await apiGet(`/api/assets${qs}`));
   } catch (e) { return errorResult(e); }
@@ -182,7 +184,7 @@ server.tool("verify_settlement", "Verify a settlement's hash chain integrity", {
 server.tool("get_carbon_attestation", "Get carbon attestation for a site", {
   site_id: z.number().describe("Site ID"),
 }, async ({ site_id }) => {
-  try { return text(await apiGet(`/api/v1/settlements/${site_id}/carbon-attestation`)); }
+  try { return text(await apiGet(DEMO_MODE ? "/api/v1/demo/carbon" : `/api/v1/settlements/${site_id}/carbon-attestation`)); }
   catch (e) { return errorResult(e); }
 });
 
@@ -245,6 +247,7 @@ server.tool("list_dr_events", "List demand response events", {
   facility_id: z.string().optional().describe("Filter by facility"),
 }, async ({ status, facility_id }) => {
   try {
+    if (DEMO_MODE) return text(await apiGet("/api/v1/demo/dr/events"));
     const qs = new URLSearchParams();
     if (status) qs.set("status", status);
     if (facility_id) qs.set("facility_id", facility_id);
@@ -430,11 +433,11 @@ server.resource(
 // ─── Start ─────────────────────────────────────────────────────────────────
 
 async function main() {
-  if (!API_KEY && !TOKEN) {
-    console.error("Warning: No ENERGYATIT_API_KEY or ENERGYATIT_TOKEN set. Requests will be unauthenticated.");
-    console.error("Set ENERGYATIT_API_KEY=eat_live_xxx or ENERGYATIT_TOKEN=jwt_xxx in your environment.");
+  if (DEMO_MODE) {
+    console.error("No API key set — running in demo mode (read-only public data).");
+    console.error("Set ENERGYATIT_API_KEY for full access, or call provision_sandbox to get a sandbox key.");
   }
-  console.error(`EnergyAtIt MCP server v1.0.0 — connecting to ${BASE_URL}`);
+  console.error(`EnergyAtIt MCP server v0.2.0 — connecting to ${BASE_URL}`);
 
   const transport = new StdioServerTransport();
   await server.connect(transport);
